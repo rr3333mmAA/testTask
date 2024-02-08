@@ -21,9 +21,9 @@ async def start_handler(message: Message) -> None:
     """
     not_subscribed = await is_subscribed(message)
     if not_subscribed:
-        await message.answer(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscription())
+        await message.answer(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscriptionKB())
     else:
-        await message.answer("Главное меню:", reply_markup=keyboard.main_menu())
+        await message.answer("Главное меню:", reply_markup=keyboard.main_menuKB())
 
 
 @dp.callback_query(keyboard.StartCB.filter(F.check == "check"))
@@ -34,11 +34,12 @@ async def check_sub_handler(query: CallbackQuery) -> None:
     not_subscribed = await is_subscribed(query)
     if not_subscribed:
         try:
-            await query.message.edit_text(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscription())
+            await query.message.edit_text(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscriptionKB())
         except TelegramBadRequest:
             pass
     else:
-        await query.message.edit_text("Главное меню:", reply_markup=keyboard.main_menu())
+        await query.message.edit_text("Главное меню:", reply_markup=keyboard.main_menuKB())
+
 
 @dp.callback_query(keyboard.MainMenuCB.filter(F.callback == keyboard.MainMenu.catalog))
 async def catalog_handler(query: CallbackQuery) -> None:
@@ -46,7 +47,44 @@ async def catalog_handler(query: CallbackQuery) -> None:
     This handler receives callback queries from catalog button
     """
     try:
-        await query.message.edit_text("Категории товаров", reply_markup=keyboard.main_menu())
+        await query.message.edit_text("Категории товаров", reply_markup=keyboard.catalogKB())
+    except TelegramBadRequest:
+        pass
+
+
+@dp.callback_query(lambda c: c.data.startswith("catalog:"))
+async def category_handler(query: CallbackQuery) -> None:
+    """
+    This handler receives callback queries from category buttons
+    """
+    category = query.data.split(":")[1]
+    try:
+        await query.message.edit_text(f"Товары в категории {category}", reply_markup=keyboard.categoryKB(category))
+    except TelegramBadRequest:
+        pass
+
+
+@dp.callback_query(lambda c: c.data.startswith("subcategory:"))
+async def subcategory_handler(query: CallbackQuery) -> None:
+    """
+    This handler receives callback queries from subcategory buttons
+    """
+    category = query.data.split(":")[1]
+    subcategory = query.data.split(":")[2]
+    try:
+        await query.message.edit_text(f"Товары в подкатегории {subcategory}", reply_markup=keyboard.subcategoryKB(category, subcategory))
+    except TelegramBadRequest:
+        pass
+
+
+@dp.callback_query(lambda c: c.data.startswith("product:"))
+async def product_handler(query: CallbackQuery) -> None:
+    """
+    This handler receives callback queries from product buttons
+    """
+    product = query.data.split(":")[1]
+    try:
+        await query.message.edit_text(f"Описание {product}", reply_markup=keyboard.productKB())     # TODO: Add image and description
     except TelegramBadRequest:
         pass
 
@@ -56,7 +94,7 @@ async def shopping_cart_handler(query: CallbackQuery) -> None:
     This handler receives callback queries from shopping_cart button
     """
     try:
-        await query.message.edit_text("Корзина", reply_markup=keyboard.main_menu())
+        await query.message.edit_text("Корзина", reply_markup=keyboard.main_menuKB())
     except TelegramBadRequest:
         pass
 
@@ -67,6 +105,6 @@ async def faq_handler(query: CallbackQuery) -> None:
     This handler receives callback queries from faq button
     """
     try:
-        await query.message.edit_text("FAQ", reply_markup=keyboard.main_menu())
+        await query.message.edit_text("FAQ", reply_markup=keyboard.main_menuKB())
     except TelegramBadRequest:
         pass
