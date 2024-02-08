@@ -6,6 +6,7 @@ from aiogram import F, Dispatcher
 from aiogram.types import CallbackQuery, Message
 from aiogram.filters import CommandStart
 
+from db import Database
 from functions import is_subscribed
 
 dp = Dispatcher()
@@ -69,10 +70,9 @@ async def subcategory_handler(query: CallbackQuery) -> None:
     """
     This handler receives callback queries from subcategory buttons
     """
-    category = query.data.split(":")[1]
-    subcategory = query.data.split(":")[2]
+    subcategory = query.data.split(":")[1]
     try:
-        await query.message.edit_text(f"Товары в подкатегории {subcategory}", reply_markup=keyboard.subcategoryKB(category, subcategory))
+        await query.message.edit_text(f"Товары в подкатегории {subcategory}", reply_markup=keyboard.subcategoryKB(subcategory))
     except TelegramBadRequest:
         pass
 
@@ -83,10 +83,12 @@ async def product_handler(query: CallbackQuery) -> None:
     This handler receives callback queries from product buttons
     """
     product = query.data.split(":")[1]
+    product_details = Database.get_product(product)
     try:
-        await query.message.edit_text(f"Описание {product}", reply_markup=keyboard.productKB())     # TODO: Add image and description
+        await query.message.edit_text(f"Описание {product}: {product_details[2]}", reply_markup=keyboard.productKB())     # TODO: Add image and description
     except TelegramBadRequest:
         pass
+
 
 @dp.callback_query(keyboard.MainMenuCB.filter(F.callback == keyboard.MainMenu.shopping_cart))
 async def shopping_cart_handler(query: CallbackQuery) -> None:

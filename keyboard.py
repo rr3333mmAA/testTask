@@ -1,13 +1,11 @@
-# TODO: callback_data has limitations
-
-import json
 from enum import Enum
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-catalog_json = json.load(open("catalog.json"))
+from db import Database
+
 
 class StartCB(CallbackData, prefix="start"):
     check: str
@@ -57,7 +55,8 @@ def catalogKB():
     This function returns InlineKeyboardMarkup with catalog buttons
     """
     builder = InlineKeyboardBuilder()
-    for category in catalog_json:
+    categories = Database.get_categories()
+    for category in categories:
         builder.button(
             text=category,
             callback_data=f"catalog:{category}",
@@ -70,23 +69,25 @@ def categoryKB(category: str):
     This function returns InlineKeyboardMarkup with category buttons
     """
     builder = InlineKeyboardBuilder()
-    for subcategory in catalog_json[category]:
+    subcategories = Database.get_subcategories(category)
+    for subcategory in subcategories:
         builder.button(
             text=subcategory,
-            callback_data=f"subcategory:{category}:{subcategory}",
+            callback_data=f"subcategory:{subcategory}",
         )
     return builder.as_markup()
 
 
-def subcategoryKB(category: str, subcategory: str):
+def subcategoryKB(subcategory: str):
     """
     This function returns InlineKeyboardMarkup with subcategory buttons
     """
     builder = InlineKeyboardBuilder()
-    for product in catalog_json[category][subcategory]:
+    products = Database.get_products(subcategory)
+    for product in products:
         builder.button(
-            text=product,
-            callback_data=f"product:{product}",
+            text=product[0],
+            callback_data=f"product:{product[0]}",
         )
     return builder.as_markup()
 
