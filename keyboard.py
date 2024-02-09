@@ -22,8 +22,8 @@ class MainMenuCB(CallbackData, prefix="main_menu"):
     callback: MainMenu
 
 class Product(str, Enum):
-    buy = "Купить"
-    back = "Назад"
+    buy = "Добавить в корзину"
+    # back = "Назад"        # TODO: add back button
 
 class ProductCB(CallbackData, prefix="product"):
     callback: Product

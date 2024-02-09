@@ -20,6 +20,7 @@ async def start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
+    Database.add_user(message.from_user.id)
     not_subscribed = await is_subscribed(message)
     if not_subscribed:
         await message.answer(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscriptionKB())
@@ -85,7 +86,7 @@ async def product_handler(query: CallbackQuery) -> None:
     product = query.data.split(":")[1]
     product_details = Database.get_product(product)
     try:
-        await query.message.edit_text(f"Описание {product}: {product_details[2]}", reply_markup=keyboard.productKB())     # TODO: Add image and description
+        await query.message.edit_text(f"Количество - {product_details[1]}\nОписание {product}: {product_details[2]}", reply_markup=keyboard.productKB())     # TODO: Add image
     except TelegramBadRequest:
         pass
 
@@ -95,8 +96,10 @@ async def shopping_cart_handler(query: CallbackQuery) -> None:
     """
     This handler receives callback queries from shopping_cart button
     """
+    cart_products = Database.get_cart_products(query.from_user.id)
+    products = [f"{product[0]}: {product[1]}" for product in cart_products]
     try:
-        await query.message.edit_text("Корзина", reply_markup=keyboard.main_menuKB())
+        await query.message.edit_text(f"Корзина:\n{nl}{nl.join(products)}", reply_markup=keyboard.main_menuKB())
     except TelegramBadRequest:
         pass
 

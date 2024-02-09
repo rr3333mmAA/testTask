@@ -30,7 +30,7 @@ class Database:
         try:
             # Check if the tables exists in the current database
             exists = []
-            for table in ["category", "catalog"]:
+            for table in ["category", "catalog", "users", "cart"]:
                 cls.cur.execute(f"""
                     SELECT EXISTS (
                         SELECT 1
@@ -59,6 +59,25 @@ class Database:
                         img_path varchar,
                         subcategory varchar,
                         FOREIGN KEY (subcategory) REFERENCES category (subcategory)
+                    );
+                """)
+
+                # Create users table
+                cls.cur.execute("""
+                    CREATE TABLE users (
+                        id serial PRIMARY KEY,
+                        user_tgid integer,
+                        address varchar
+                    );
+                """)
+
+                # Create cart table
+                cls.cur.execute("""
+                    CREATE TABLE cart (
+                        id serial PRIMARY KEY,
+                        user_tgid integer,
+                        product varchar,
+                        amount integer
                     );
                 """)
 
@@ -150,6 +169,32 @@ class Database:
         try:
             cls.cur.execute(f"SELECT product, amount, description, img_path FROM catalog WHERE product = '{product}';")
             return cls.cur.fetchone()
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def add_user(cls, user_tgid: int):
+        """
+        This method adds user to the users table
+        """
+        try:
+            # Check if the user exists in the users table
+            cls.cur.execute(f"SELECT 1 FROM users WHERE user_tgid = {user_tgid};")
+            exists = cls.cur.fetchone()
+            if not exists:
+                # Add user to the users table
+                cls.cur.execute(f"INSERT INTO users (user_tgid, address) VALUES ({user_tgid}, 'uknown');")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def get_cart_products(cls, user_tgid: int):
+        """
+        This method returns all products from the cart table
+        """
+        try:
+            cls.cur.execute(f"SELECT product, amount FROM cart WHERE user_tgid = {user_tgid};")
+            return cls.cur.fetchall()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
 
