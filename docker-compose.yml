@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+  bot:
+    container_name: bot
+    build: ./bot
+    environment:
+      - BOT_TOKEN=6759692513:AAHIBaeZlJ6xYyVYYwn6udUArYLVq4WdSAs
+      - CHANNELS_TO_SUBSCRIBE=@r33mAtestTaskChannel, @r33mAtestTaskGroup
+      - BOT_USERNAME=r33ma_testtask_bot
+      - YOOKASSA_TOKEN=test_p4zvxDUW8e7no3XA1dAwnAY_yYxVjp8mkDgLgLoX1qo
+      - YOOKASSA_ID=330996
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    depends_on:
+      - postgres
+
+  admin_panel:
+    container_name: admin_panel
+    build: ./admin_panel
+    environment:
+      - BOT_TOKEN=6759692513:AAHIBaeZlJ6xYyVYYwn6udUArYLVq4WdSAs
+      - POSTGRES_DB=testtask
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres

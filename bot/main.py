@@ -21,7 +21,7 @@ async def main() -> None:
     # Initialize database and create tables
     init_db("testtask")
     Database.create_tables()
-    # Database.load_starter_catalog()  # Load starter catalog from starter_catalog.json (TODO: already loaded)
+    Database.load_starter_catalog()  # Load starter catalog from starter_catalog.json
 
     # Run events dispatching
     await dp.start_polling(bot)

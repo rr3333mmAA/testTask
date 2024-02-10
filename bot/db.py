@@ -14,8 +14,9 @@ class Database:
         try:
             cls.conn = psycopg2.connect(
                 database=db_name.lower(),
-                user=getenv("DB_USER"),
-                password=getenv("DB_PASSWORD")
+                user=getenv("POSTGRES_USER"),
+                password=getenv("POSTGRES_PASSWORD"),
+                host=getenv("POSTGRES_HOST")
             )
             cls.conn.autocommit = True
             cls.cur = cls.conn.cursor()
@@ -106,27 +107,34 @@ class Database:
         """
         try:
             json_catalog = json.load(open("starter_catalog.json"))
-            categories = {}
-            products = {}
+            if not json_catalog["init"]:
+                categories = {}
+                products = {}
 
-            for category in json_catalog:
-                categories[category] = []
-                for subcategory in json_catalog[category]:
-                    categories[category].append(subcategory)
-                    products[subcategory] = json_catalog[category][subcategory]
+                for category in json_catalog:
+                    if category != "init":
+                        categories[category] = []
+                        for subcategory in json_catalog[category]:
+                            categories[category].append(subcategory)
+                            products[subcategory] = json_catalog[category][subcategory]
 
-            # Insert categories into the category table
-            for category in categories:
-                for subcategory in categories[category]:
-                    cls.cur.execute(f"INSERT INTO category (subcategory, category) VALUES ('{subcategory}', '{category}');")
+                # Insert categories into the category table
+                for category in categories:
+                    for subcategory in categories[category]:
+                        cls.cur.execute(f"INSERT INTO category (subcategory, category) VALUES ('{subcategory}', '{category}');")
 
-            # Insert products into the catalog table
-            for subcategory in products:
-                for product in products[subcategory]:
-                    cls.cur.execute(f"INSERT INTO catalog (product, quantity, description, img_path, subcategory, price) VALUES ('{product}', {products[subcategory][product]['quantity']}, '{products[subcategory][product]['description']}', '{products[subcategory][product]['img_path']}', '{subcategory}', '{products[subcategory][product]['price']}');")
+                # Insert products into the catalog table
+                for subcategory in products:
+                    for product in products[subcategory]:
+                        cls.cur.execute(f"INSERT INTO catalog (product, quantity, description, img_path, subcategory, price) VALUES ('{product}', {products[subcategory][product]['quantity']}, '{products[subcategory][product]['description']}', '{products[subcategory][product]['img_path']}', '{subcategory}', '{products[subcategory][product]['price']}');")
 
-            # Print success message
-            print("Starter catalog loaded successfully")
+                # Update json_catalog["init"] to True
+                json_catalog["init"] = True
+                with open("bot/starter_catalog.json", "w", encoding='utf8') as file:
+                    json.dump(json_catalog, file, indent=4, ensure_ascii=False)
+
+                # Print success message
+                print("Starter catalog loaded successfully")
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
 
@@ -295,8 +303,9 @@ def init_db(db_name: str):
         load_dotenv()
         conn = psycopg2.connect(
             database="postgres",
-            user=getenv("DB_USER"),
-            password=getenv("DB_PASSWORD")
+            user=getenv("POSTGRES_USER"),
+            password=getenv("POSTGRES_PASSWORD"),
+            host=getenv("POSTGRES_HOST")
         )
         conn.autocommit = True
 

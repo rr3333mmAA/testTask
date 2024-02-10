@@ -158,7 +158,7 @@ async def quantity_handler(message: Message, state: FSMContext) -> None:
     quantity = data["quantity"]
     if not quantity.isdigit() or int(quantity) < 0 or not Database.check_quantity(product, int(quantity)):
         await message.answer("Товара в таком количестве нет на складе")
-        await message.answer(f"Количество - {product_details[1]}\nОписание {product}:\n{product_details[2]}\n\nЦена: {product_details[4]}", reply_markup=keyboard.cartKB())
+        await message.answer(f"Количество - {product_details[1]}\nОписание {product}:\n{product_details[2]}\n\nЦена: {product_details[4]}", reply_markup=keyboard.add_to_cartKB())
         await state.set_state(AddToCart.product)
     elif int(quantity) == 0:
         await message.answer("Количество товара не может быть равно 0. Попробуйте еще раз")

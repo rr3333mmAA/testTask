@@ -1,1 +1,0 @@
-channels2subscribe = ['@r33mAtestTaskChannel', '@r33mAtestTaskGroup']  # Public channels and groups entities to subscribe
