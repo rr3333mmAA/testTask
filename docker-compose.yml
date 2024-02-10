@@ -14,11 +14,11 @@ services:
     container_name: bot
     build: ./bot
     environment:
-      - BOT_TOKEN=6759692513:AAHIBaeZlJ6xYyVYYwn6udUArYLVq4WdSAs
-      - CHANNELS_TO_SUBSCRIBE=@r33mAtestTaskChannel, @r33mAtestTaskGroup
-      - BOT_USERNAME=r33ma_testtask_bot
-      - YOOKASSA_TOKEN=test_p4zvxDUW8e7no3XA1dAwnAY_yYxVjp8mkDgLgLoX1qo
-      - YOOKASSA_ID=330996
+      - BOT_TOKEN=<YOUR_BOT_TOKEN>
+      - CHANNELS_TO_SUBSCRIBE=<YOUR_CHANNELS_TO_SUBSCRIBE>
+      - BOT_USERNAME=<YOUR_BOT_USERNAME>
+      - YOOKASSA_TOKEN=<YOUR_YOOKASSA_TOKEN>
+      - YOOKASSA_ID=<YOUR_YOOKASSA_ID>
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_HOST=postgres
@@ -30,7 +30,7 @@ services:
     container_name: admin_panel
     build: ./admin_panel
     environment:
-      - BOT_TOKEN=6759692513:AAHIBaeZlJ6xYyVYYwn6udUArYLVq4WdSAs
+      - BOT_TOKEN=<YOUR_BOT_TOKEN>
       - POSTGRES_DB=testtask
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
