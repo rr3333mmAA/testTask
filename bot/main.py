@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from handlers import dp
 from db import init_db, Database
 
-# Loading .env file and initialize bot token as TOKEN
+# Load environment variables from .env file
 load_dotenv()
 TOKEN = getenv("BOT_TOKEN")
 

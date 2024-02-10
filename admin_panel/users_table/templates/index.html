@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>testTask User Database</title>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .input-area {
+        margin-top: 20px;
+    }
+    .input-area input[type="text"] {
+        padding: 8px;
+        width: 70%;
+    }
+    .input-area button {
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>User Database</h2>
+
+<form id="messageForm" action="{% url 'send_message' %}" method="post">
+    {% csrf_token %}
+    <table>
+      <thead>
+        <tr>
+          <th>Telegram ID</th>
+          <th>Address</th>
+          <th>Select</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.user_tgid }}</td>
+          <td>{{ user.address }}</td>
+          <td><input type="checkbox" name="selected_users" value="{{ user.user_tgid }}"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="input-area">
+        <input type="text" id="message" name="message" placeholder="Type your message here...">
+        <button type="submit">Send message</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('messageForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var selectedUsers = document.querySelectorAll('input[name="selected_users"]:checked');
+        var selectedUserIds = Array.from(selectedUsers).map(function(user) {
+            return user.value;
+        });
+        var message = document.getElementById('message').value;
+        if (selectedUserIds.length > 0 && message.trim() !== '') {
+            this.submit();
+        } else {
+            alert('Select users and enter a message.');
+        }
+    });
+</script>
+
+</body>
+</html>

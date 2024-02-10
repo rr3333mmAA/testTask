@@ -1,9 +1,9 @@
-import psycopg2
-import json
 from os import getenv
 
-from dotenv import load_dotenv
+import psycopg2
+import json
 
+from dotenv import load_dotenv
 
 class Database:
     conn = None
@@ -54,10 +54,11 @@ class Database:
                     CREATE TABLE catalog (
                         id serial PRIMARY KEY,
                         product varchar,
-                        amount integer,
+                        quantity integer,
                         description varchar,
                         img_path varchar,
                         subcategory varchar,
+                        price integer,
                         FOREIGN KEY (subcategory) REFERENCES category (subcategory)
                     );
                 """)
@@ -77,6 +78,7 @@ class Database:
                         id serial PRIMARY KEY,
                         user_tgid integer,
                         product varchar,
+                        quantity integer,
                         amount integer
                     );
                 """)
@@ -121,7 +123,7 @@ class Database:
             # Insert products into the catalog table
             for subcategory in products:
                 for product in products[subcategory]:
-                    cls.cur.execute(f"INSERT INTO catalog (product, amount, description, img_path, subcategory) VALUES ('{product}', {products[subcategory][product]['amount']}, '{products[subcategory][product]['description']}', '{products[subcategory][product]['img_path']}', '{subcategory}');")
+                    cls.cur.execute(f"INSERT INTO catalog (product, quantity, description, img_path, subcategory, price) VALUES ('{product}', {products[subcategory][product]['quantity']}, '{products[subcategory][product]['description']}', '{products[subcategory][product]['img_path']}', '{subcategory}', '{products[subcategory][product]['price']}');")
 
             # Print success message
             print("Starter catalog loaded successfully")
@@ -156,7 +158,7 @@ class Database:
         This method returns all products from the catalog table
         """
         try:
-            cls.cur.execute(f"SELECT product, amount, description, img_path FROM catalog WHERE subcategory = '{subcategory}';")
+            cls.cur.execute(f"SELECT product, quantity, description, img_path FROM catalog WHERE subcategory = '{subcategory}';")
             return cls.cur.fetchall()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
@@ -167,7 +169,7 @@ class Database:
         This method returns product from the catalog table
         """
         try:
-            cls.cur.execute(f"SELECT product, amount, description, img_path FROM catalog WHERE product = '{product}';")
+            cls.cur.execute(f"SELECT product, quantity, description, img_path, price FROM catalog WHERE product = '{product}';")
             return cls.cur.fetchone()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
@@ -193,10 +195,98 @@ class Database:
         This method returns all products from the cart table
         """
         try:
-            cls.cur.execute(f"SELECT product, amount FROM cart WHERE user_tgid = {user_tgid};")
+            cls.cur.execute(f"SELECT product, SUM(quantity) AS total_quantity FROM cart WHERE user_tgid = {user_tgid} GROUP BY product;")
             return cls.cur.fetchall()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
+
+    @classmethod
+    def check_quantity(cls, product: str, quantity: int):
+        """
+        This method checks if the quantity of product is available
+        """
+        try:
+            cls.cur.execute(f"SELECT quantity FROM catalog WHERE product = '{product}';")
+            product_quantity = cls.cur.fetchone()[0]
+            return product_quantity >= quantity
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def add_to_cart(cls, user_tgid: int, product: str, quantity: int, price: int):
+        """
+        This method adds product to the cart table
+        """
+        try:
+            cls.cur.execute(f"INSERT INTO cart (user_tgid, product, quantity, amount) VALUES ({user_tgid}, '{product}', {quantity}, {quantity*price});")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def delete_product(cls, user_tgid: int, product: str):
+        """
+        This method deletes product from the cart table
+        """
+        try:
+            cls.cur.execute(f"DELETE FROM cart WHERE user_tgid = {user_tgid} AND product = '{product}';")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def change_address(cls, user_tgid: int, address: str):
+        """
+        This method changes user's address in the users table
+        """
+        try:
+            cls.cur.execute(f"UPDATE users SET address = '{address}' WHERE user_tgid = {user_tgid};")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def get_user_amount(cls, user_tgid: int):
+        """
+        This method returns user's amount from the cart table
+        """
+        try:
+            cls.cur.execute(f"SELECT SUM(amount) FROM cart WHERE user_tgid = {user_tgid};")
+            return cls.cur.fetchone()[0]
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def clear_cart(cls, user_tgid: int):
+        """
+        This method clears user's cart in the cart table
+        """
+        try:
+            cls.cur.execute(f"DELETE FROM cart WHERE user_tgid = {user_tgid};")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def update_quantity(cls, user_tgid: int):
+        """
+        This method updates product's quantity in the catalog table by user's order
+        """
+        try:
+            cls.cur.execute(f"SELECT product, quantity FROM cart WHERE user_tgid = {user_tgid};")
+            products = cls.cur.fetchall()
+            for product in products:
+                cls.cur.execute(f"UPDATE catalog SET quantity = quantity - {product[1]} WHERE product = '{product[0]}';")
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
+    @classmethod
+    def get_user_address(cls, user_tgid: int):
+        """
+        This method returns user's address from the users table
+        """
+        try:
+            cls.cur.execute(f"SELECT address FROM users WHERE user_tgid = {user_tgid};")
+            return cls.cur.fetchone()[0]
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
+
 
 
 def init_db(db_name: str):
