@@ -1,187 +1,187 @@
 {
     "init": false,
-    "Категория1": {
-        "Подкатегория11": {
-            "товар111": {
+    "Одежда": {
+        "Женщины": {
+            "Платье": {
                 "quantity": 111,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Элегантное платье с блестящими деталями",
+                "img_path": "img/item.jpg",
                 "price": 100
             },
-            "товар112": {
+            "Джинсы": {
                 "quantity": 112,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Джинсы с высокой посадкой",
+                "img_path": "img/item.jpg",
                 "price": 200
             },
-            "товар113": {
+            "Юбка": {
                 "quantity": 113,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Юбка-миди в полоску",
+                "img_path": "img/item.jpg",
                 "price": 300
             }
         },
-        "Подкатегория12": {
-            "товар121": {
+        "Мужчины": {
+            "Обувь": {
                 "quantity": 121,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Кожаные ботинки на шнурках",
+                "img_path": "img/item.jpg",
                 "price": 400
             },
-            "товар122": {
+            "Кроссовки": {
                 "quantity": 122,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Спортивные кроссовки с амортизацией",
+                "img_path": "img/item.jpg",
                 "price": 500
             },
-            "товар123": {
+            "Туфли": {
                 "quantity": 123,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Классические туфли для офиса",
+                "img_path": "img/item.jpg",
                 "price": 600
             }
         },
-        "Подкатегория13": {
-            "товар131": {
+        "Аксессуары": {
+            "Платок": {
                 "quantity": 131,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Шелковый платок с цветочным принтом",
+                "img_path": "img/item.jpg",
                 "price": 700
             },
-            "товар132": {
+            "Очки": {
                 "quantity": 132,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Солнцезащитные очки с ультрафиолетовой защитой",
+                "img_path": "img/item.jpg",
                 "price": 800
             },
-            "товар133": {
+            "Ремень": {
                 "quantity": 133,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Кожаный ремень с металлической пряжкой",
+                "img_path": "img/item.jpg",
                 "price": 900
             }
         }
     },
-    "Категория2": {
-        "Подкатегория21": {
-            "товар211": {
+    "Техника": {
+        "Смартфоны": {
+            "iPhone": {
                 "quantity": 211,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "iPhone 13 Pro Max",
+                "img_path": "img/item.jpg",
                 "price": 1000
             },
-            "товар212": {
+            "Samsung": {
                 "quantity": 212,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Samsung Galaxy S21 Ultra",
+                "img_path": "img/item.jpg",
                 "price": 1100
             },
-            "товар213": {
+            "Xiaomi": {
                 "quantity": 213,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Xiaomi Mi 11",
+                "img_path": "img/item.jpg",
                 "price": 1200
             }
         },
-        "Подкатегория22": {
-            "товар221": {
+        "Ноутбуки": {
+            "MacBook": {
                 "quantity": 221,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Apple MacBook Pro 16\"",
+                "img_path": "img/item.jpg",
                 "price": 1300
             },
-            "товар222": {
+            "Lenovo": {
                 "quantity": 222,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Lenovo Yoga C940",
+                "img_path": "img/item.jpg",
                 "price": 1400
             },
-            "товар223": {
+            "Microsoft": {
                 "quantity": 223,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Microsoft Surface Pro 8",
+                "img_path": "img/item.jpg",
                 "price": 1500
             }
         },
-        "Подкатегория23": {
-            "товар231": {
+        "Гаджеты": {
+            "Часы": {
                 "quantity": 231,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Умные часы Apple Watch Series 7",
+                "img_path": "img/item.jpg",
                 "price": 1600
             },
-            "товар232": {
+            "Колонки": {
                 "quantity": 232,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Умные колонки Amazon Echo Dot",
+                "img_path": "img/item.jpg",
                 "price": 1700
             },
-            "товар233": {
+            "Хаб": {
                 "quantity": 233,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Умный домашний хаб Google Nest Hub",
+                "img_path": "img/item.jpg",
                 "price": 1800
             }
         }
     },
-    "Категория3": {
-        "Подкатегория31": {
-            "товар311": {
+    "Красота": {
+        "Уход": {
+            "Гель": {
                 "quantity": 311,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Очищающий гель с экстрактом зеленого чая",
+                "img_path": "img/item.jpg",
                 "price": 1900
             },
-            "товар312": {
+            "Крем": {
                 "quantity": 312,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Увлажняющий крем с гиалуроновой кислотой",
+                "img_path": "img/item.jpg",
                 "price": 2000
             },
-            "товар313": {
+            "Маска": {
                 "quantity": 313,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Маска-пленка для лица с коллагеном",
+                "img_path": "img/item.jpg",
                 "price": 2100
             }
         },
-        "Подкатегория32": {
-            "товар321": {
+        "Макияж": {
+            "Тени": {
                 "quantity": 321,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Палетка теней для век с матовыми и сияющими оттенками",
+                "img_path": "img/item.jpg",
                 "price": 2200
             },
-            "товар322": {
+            "Помада": {
                 "quantity": 322,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Жидкая помада с эффектом матового бархата",
+                "img_path": "img/item.jpg",
                 "price": 2300
             },
-            "товар323": {
+            "Тушь": {
                 "quantity": 323,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Удлиняющая тушь для ресниц с объемным эффектом",
+                "img_path": "img/item.jpg",
                 "price": 2400
             }
         },
-        "Подкатегория33": {
-            "товар331": {
+        "Парфюмерия": {
+            "Аромат": {
                 "quantity": 331,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Женский аромат Chanel Chance Eau Tendre",
+                "img_path": "img/item.jpg",
                 "price": 2500
             },
-            "товар332": {
+            "Парфюм": {
                 "quantity": 332,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Мужской парфюм Dior Sauvage",
+                "img_path": "img/item.jpg",
                 "price": 2600
             },
-            "товар333": {
+            "Унисекс": {
                 "quantity": 333,
-                "description": "описание",
-                "img_path": "путь/до/фото",
+                "description": "Унисекс аромат Tom Ford Black Orchid",
+                "img_path": "img/item.jpg",
                 "price": 2700
             }
         }

@@ -5,6 +5,7 @@ import json
 
 from dotenv import load_dotenv
 
+
 class Database:
     conn = None
     cur = None
@@ -121,16 +122,28 @@ class Database:
                 # Insert categories into the category table
                 for category in categories:
                     for subcategory in categories[category]:
-                        cls.cur.execute(f"INSERT INTO category (subcategory, category) VALUES ('{subcategory}', '{category}');")
+                        cls.cur.execute(
+                            f"INSERT INTO category (subcategory, category) VALUES ('{subcategory}', '{category}');"
+                        )
 
                 # Insert products into the catalog table
                 for subcategory in products:
                     for product in products[subcategory]:
-                        cls.cur.execute(f"INSERT INTO catalog (product, quantity, description, img_path, subcategory, price) VALUES ('{product}', {products[subcategory][product]['quantity']}, '{products[subcategory][product]['description']}', '{products[subcategory][product]['img_path']}', '{subcategory}', '{products[subcategory][product]['price']}');")
+                        cls.cur.execute(
+                            f"INSERT INTO catalog (product, quantity, description, img_path, subcategory, price) "
+                            f"VALUES ("
+                            f"'{product}',"
+                            f" {products[subcategory][product]['quantity']},"
+                            f" '{products[subcategory][product]['description']}',"
+                            f" '{products[subcategory][product]['img_path']}',"
+                            f" '{subcategory}',"
+                            f" '{products[subcategory][product]['price']}'"
+                            f");"
+                        )
 
                 # Update json_catalog["init"] to True
                 json_catalog["init"] = True
-                with open("bot/starter_catalog.json", "w", encoding='utf8') as file:
+                with open("starter_catalog.json", "w", encoding='utf8') as file:
                     json.dump(json_catalog, file, indent=4, ensure_ascii=False)
 
                 # Print success message
@@ -166,7 +179,9 @@ class Database:
         This method returns all products from the catalog table
         """
         try:
-            cls.cur.execute(f"SELECT product, quantity, description, img_path FROM catalog WHERE subcategory = '{subcategory}';")
+            cls.cur.execute(
+                f"SELECT product, quantity, description, img_path FROM catalog WHERE subcategory = '{subcategory}';"
+            )
             return cls.cur.fetchall()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
@@ -177,7 +192,9 @@ class Database:
         This method returns product from the catalog table
         """
         try:
-            cls.cur.execute(f"SELECT product, quantity, description, img_path, price FROM catalog WHERE product = '{product}';")
+            cls.cur.execute(
+                f"SELECT product, quantity, description, img_path, price FROM catalog WHERE product = '{product}';"
+            )
             return cls.cur.fetchone()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
@@ -203,7 +220,10 @@ class Database:
         This method returns all products from the cart table
         """
         try:
-            cls.cur.execute(f"SELECT product, SUM(quantity) AS total_quantity FROM cart WHERE user_tgid = {user_tgid} GROUP BY product;")
+            cls.cur.execute(
+                f"SELECT product, SUM(quantity) AS total_quantity "
+                f"FROM cart WHERE user_tgid = {user_tgid} GROUP BY product;"
+            )
             return cls.cur.fetchall()
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
@@ -226,7 +246,10 @@ class Database:
         This method adds product to the cart table
         """
         try:
-            cls.cur.execute(f"INSERT INTO cart (user_tgid, product, quantity, amount) VALUES ({user_tgid}, '{product}', {quantity}, {quantity*price});")
+            cls.cur.execute(
+                f"INSERT INTO cart (user_tgid, product, quantity, amount) "
+                f"VALUES ({user_tgid}, '{product}', {quantity}, {quantity*price});"
+            )
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
 
@@ -280,7 +303,9 @@ class Database:
             cls.cur.execute(f"SELECT product, quantity FROM cart WHERE user_tgid = {user_tgid};")
             products = cls.cur.fetchall()
             for product in products:
-                cls.cur.execute(f"UPDATE catalog SET quantity = quantity - {product[1]} WHERE product = '{product[0]}';")
+                cls.cur.execute(
+                    f"UPDATE catalog SET quantity = quantity - {product[1]} WHERE product = '{product[0]}';"
+                )
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
 
@@ -295,6 +320,16 @@ class Database:
         except psycopg2.OperationalError as e:
             print(f"Database error: {e}")
 
+    @classmethod
+    def get_img_path(cls, product: str):
+        """
+        This method returns product's img_path from the catalog table
+        """
+        try:
+            cls.cur.execute(f"SELECT img_path FROM catalog WHERE product = '{product}';")
+            return cls.cur.fetchone()[0]
+        except psycopg2.OperationalError as e:
+            print(f"Database error: {e}")
 
 
 def init_db(db_name: str):

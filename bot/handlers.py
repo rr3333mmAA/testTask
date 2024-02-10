@@ -1,3 +1,5 @@
+import json
+
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -5,7 +7,7 @@ from aiogram.fsm.state import StatesGroup, State
 import keyboard
 
 from aiogram import F, Dispatcher
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, FSInputFile
 from aiogram.filters import CommandStart
 
 from db import Database
@@ -19,7 +21,6 @@ nl = '\n'
 not_subscribed_text = lambda g: f"Вы не подписаны на {nl}{nl.join(g)}"
 
 
-
 class AddToCart(StatesGroup):
     """
     This class represents states for adding product to the cart
@@ -28,11 +29,13 @@ class AddToCart(StatesGroup):
     quantity = State()
     accept = State()
 
+
 class CartProduct(StatesGroup):
     """
     This class represents states for product in the cart
     """
     product = State()
+
 
 class Address(StatesGroup):
     """
@@ -40,11 +43,13 @@ class Address(StatesGroup):
     """
     address = State()
 
+
 class Payment(StatesGroup):
     """
     This class represents states for payment
     """
     payment = State()
+
 
 @dp.message(CommandStart())
 async def start_handler(message: Message, state: FSMContext) -> None:
@@ -60,16 +65,6 @@ async def start_handler(message: Message, state: FSMContext) -> None:
         await message.answer("Главное меню:", reply_markup=keyboard.main_menuKB())
 
 
-@dp.callback_query(lambda c: c.data.endswith(":Назад"))
-async def back_handler(query: CallbackQuery, state: FSMContext) -> None:
-    # TODO: Change it
-    await state.clear()
-    try:
-        await query.message.edit_text("Главное меню:", reply_markup=keyboard.main_menuKB())
-    except TelegramBadRequest:
-        pass
-
-
 @dp.callback_query(keyboard.StartCB.filter(F.check == "check"))
 async def check_sub_handler(query: CallbackQuery) -> None:
     """
@@ -78,7 +73,9 @@ async def check_sub_handler(query: CallbackQuery) -> None:
     not_subscribed = await is_subscribed(query)
     if not_subscribed:
         try:
-            await query.message.edit_text(not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscriptionKB())
+            await query.message.edit_text(
+                not_subscribed_text(not_subscribed), reply_markup=keyboard.check_subscriptionKB()
+            )
         except TelegramBadRequest:
             pass
     else:
@@ -115,7 +112,10 @@ async def subcategory_handler(query: CallbackQuery) -> None:
     """
     subcategory = query.data.split(":")[1]
     try:
-        await query.message.edit_text(f"Товары в подкатегории {subcategory}", reply_markup=keyboard.subcategoryKB(subcategory))
+        await query.message.edit_text(
+            f"Товары в подкатегории {subcategory}",
+            reply_markup=keyboard.subcategoryKB(subcategory)
+        )
     except TelegramBadRequest:
         pass
 
@@ -130,7 +130,13 @@ async def product_handler(query: CallbackQuery, state: FSMContext) -> None:
     product_details = Database.get_product(product)
     await state.update_data(product=product)
     try:
-        await query.message.edit_text(f"Количество - {product_details[1]}\nОписание {product}:\n{product_details[2]}\n\nЦена: {product_details[4]}", reply_markup=keyboard.add_to_cartKB())     # TODO: Add image
+        image = FSInputFile(Database.get_img_path(product))
+        await query.bot.send_photo(
+            query.from_user.id,
+            image,
+            caption=f"{product}\n\nКоличество: {product_details[1]}\n"
+                    f"Описание:\n{product_details[2]}\n\nЦена: {product_details[4]}",
+            reply_markup=keyboard.add_to_cartKB())
     except TelegramBadRequest:
         pass
 
@@ -143,7 +149,7 @@ async def add_to_cart_handler(query: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(AddToCart.quantity)
     data = await state.get_data()
     product_details = Database.get_product(data["product"])
-    await query.message.edit_text(f"Количество - {product_details[1]}\nВведите количество товара")
+    await query.bot.send_message(query.from_user.id, f"Количество: {product_details[1]}\nВведите количество товара")
 
 
 @dp.message(AddToCart.quantity)
@@ -158,7 +164,11 @@ async def quantity_handler(message: Message, state: FSMContext) -> None:
     quantity = data["quantity"]
     if not quantity.isdigit() or int(quantity) < 0 or not Database.check_quantity(product, int(quantity)):
         await message.answer("Товара в таком количестве нет на складе")
-        await message.answer(f"Количество - {product_details[1]}\nОписание {product}:\n{product_details[2]}\n\nЦена: {product_details[4]}", reply_markup=keyboard.add_to_cartKB())
+        await message.answer(
+            f"{product}\n\nКоличество: {product_details[1]}\n"
+            f"Описание:\n{product_details[2]}\n\nЦена: {product_details[4]}",
+            reply_markup=keyboard.add_to_cartKB()
+        )
         await state.set_state(AddToCart.product)
     elif int(quantity) == 0:
         await message.answer("Количество товара не может быть равно 0. Попробуйте еще раз")
@@ -200,9 +210,11 @@ async def shopping_cart_handler(query: CallbackQuery) -> None:
     products = [f"{product[0]}: {product[1]}" for product in cart_products]
     total = Database.get_user_amount(query.from_user.id)
     try:
-        await query.message.edit_text(f"Корзина:{nl}{nl.join(products)}\n\nИтого - {total if total is not None else 0}", reply_markup=keyboard.cartKB(query.from_user.id))
+        await query.message.edit_text(f"Корзина:{nl}{nl.join(products)}\n\nИтого - {total if total is not None else 0}",
+                                      reply_markup=keyboard.cartKB(query.from_user.id))
     except TelegramBadRequest:
         pass
+
 
 @dp.callback_query(lambda c: c.data.startswith("cart_product:"))
 async def cart_product_handler(query: CallbackQuery, state: FSMContext) -> None:
@@ -214,9 +226,12 @@ async def cart_product_handler(query: CallbackQuery, state: FSMContext) -> None:
     product_details = Database.get_product(product)
     await state.update_data(product=product)
     try:
-        await query.message.edit_text(f"Описание {product_details[0]}:\n{product_details[2]}\n\nЦена: {product_details[4]}", reply_markup=keyboard.cart_productKB())
+        await query.message.edit_text(
+            f"{product_details[0]}\n\nОписание:\n{product_details[2]}\n\nЦена: {product_details[4]}",
+            reply_markup=keyboard.cart_productKB())
     except TelegramBadRequest:
         pass
+
 
 @dp.callback_query(keyboard.AddressCB.filter(F.address == "address"))
 async def address_handler(query: CallbackQuery, state: FSMContext) -> None:
@@ -228,6 +243,7 @@ async def address_handler(query: CallbackQuery, state: FSMContext) -> None:
         await state.set_state(Address.address)
     except TelegramBadRequest:
         pass
+
 
 @dp.message(Address.address)
 async def address_message_handler(message: Message, state: FSMContext) -> None:
@@ -251,10 +267,19 @@ async def accept_address_handler(query: CallbackQuery, state: FSMContext) -> Non
     description = nl.join(f'{product} x {quantity}' for product, quantity in products)
     payment = YooKassa(Database.get_user_amount(query.from_user.id), description)
     payment_url = await payment.get_payment_url()
+
     await state.set_state(Payment.payment)
     await state.update_data(payment=payment)
 
     await query.message.edit_text("Оплата заказа", reply_markup=keyboard.paymentKB(payment_url))
+
+
+@dp.callback_query(lambda c: c.data == "main_menu")
+async def main_menu_handler(query: CallbackQuery) -> None:
+    """
+    This handler receives callback queries from main_menu button
+    """
+    await query.message.edit_text("Главное меню:", reply_markup=keyboard.main_menuKB())
 
 
 @dp.callback_query(lambda c: c.data == "check_payment", Payment.payment)
@@ -273,7 +298,7 @@ async def check_payment_handler(query: CallbackQuery, state: FSMContext) -> None
             query.from_user.username,
             Database.get_user_address(query.from_user.id),
             ', '.join(f'{product}({quantity})' for product, quantity in products),
-            str(Database.get_user_amount(query.from_user.id))+ " руб."
+            str(Database.get_user_amount(query.from_user.id)) + " руб."
         ])
         Database.update_quantity(query.from_user.id)
         Database.clear_cart(query.from_user.id)
@@ -285,13 +310,26 @@ async def check_payment_handler(query: CallbackQuery, state: FSMContext) -> None
         await query.answer("Оплата не прошла")
 
 
-
 @dp.callback_query(keyboard.MainMenuCB.filter(F.callback == keyboard.MainMenu.faq))
 async def faq_handler(query: CallbackQuery) -> None:
     """
     This handler receives callback queries from faq button
     """
     try:
-        await query.message.edit_text("FAQ", reply_markup=keyboard.main_menuKB())
+        await query.message.edit_text("Часто задаваемые вопросы", reply_markup=keyboard.faqKB())
+    except TelegramBadRequest:
+        pass
+
+
+@dp.callback_query(lambda c: c.data.startswith("faq"))
+async def faq_answer_handler(query: CallbackQuery) -> None:
+    """
+    This handler receives callback queries from faq buttons
+    """
+    q_num = query.data.split(":")[1]
+    with open("faq.json", "r", encoding="utf-8") as file:
+        answer = json.load(file)[q_num][1]
+    try:
+        await query.message.edit_text(f"Ответ:\n{answer}", reply_markup=keyboard.faqKB())
     except TelegramBadRequest:
         pass

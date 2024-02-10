@@ -29,5 +29,3 @@ class YooKassa:
 
     async def get_payment_status(self):
         return Payment.find_one(self.payment.id).status
-
-

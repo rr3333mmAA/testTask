@@ -1,5 +1,6 @@
 from openpyxl import Workbook, load_workbook
 
+
 def append_data_to_excel(data):
     try:
         # Load existing workbook if it exists, otherwise create a new one

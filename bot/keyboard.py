@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 
 from aiogram.filters.callback_data import CallbackData
@@ -10,11 +11,14 @@ from db import Database
 class StartCB(CallbackData, prefix="start"):
     check: str
 
+
 class AcceptCB(CallbackData, prefix="accept"):
     accept: str
 
+
 class AddressCB(CallbackData, prefix="address"):
     address: str
+
 
 class MainMenu(str, Enum):
     catalog = "Каталог"
@@ -25,16 +29,18 @@ class MainMenu(str, Enum):
 class MainMenuCB(CallbackData, prefix="main_menu"):
     callback: MainMenu
 
+
 class AddToCart(str, Enum):
     buy = "Добавить в корзину"
-    # back = "Назад"        # TODO: add back button
+
 
 class AddToCartCB(CallbackData, prefix="add_to_cart"):
     callback: AddToCart
 
+
 class CartProduct(str, Enum):
     remove = "Удалить"
-    back = "Назад"
+
 
 class CartProductCB(CallbackData, prefix="cart_product"):
     callback: CartProduct
@@ -72,6 +78,7 @@ def catalogKB():
             text=category,
             callback_data=f"catalog:{category}",
         )
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -86,6 +93,7 @@ def categoryKB(category: str):
             text=subcategory,
             callback_data=f"subcategory:{subcategory}",
         )
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -100,7 +108,9 @@ def subcategoryKB(subcategory: str):
             text=product[0],
             callback_data=f"product:{product[0]}",
         )
+    builder.adjust(1)
     return builder.as_markup()
+
 
 def add_to_cartKB():
     """
@@ -112,7 +122,9 @@ def add_to_cartKB():
             text=attr.value,
             callback_data=AddToCartCB(callback=attr),
         )
+    builder.adjust(1)
     return builder.as_markup()
+
 
 def cartKB(user_tgid: int):
     """
@@ -127,6 +139,7 @@ def cartKB(user_tgid: int):
         )
     address_button = InlineKeyboardButton(text="Адрес доставки", callback_data=AddressCB(address="address").pack())
     builder.add(address_button)
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -140,6 +153,7 @@ def cart_productKB():
             text=attr.value,
             callback_data=CartProductCB(callback=attr),
         )
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -164,8 +178,25 @@ def paymentKB(url: str):
         text="Проверить оплату",
         callback_data="check_payment",
     )
+    builder.adjust(1)
     return builder.as_markup()
 
 
-
-
+def faqKB():
+    """
+    This function returns InlineKeyboardMarkup with FAQ buttons
+    """
+    with open("faq.json", "r", encoding="utf-8") as file:
+        faq = json.load(file)
+    builder = InlineKeyboardBuilder()
+    for question in faq:
+        builder.button(
+            text=faq[question][0],
+            callback_data=f"faq:{question}",
+        )
+    builder.button(
+        text="Главное меню",
+        callback_data="main_menu"
+    )
+    builder.adjust(1)
+    return builder.as_markup()
