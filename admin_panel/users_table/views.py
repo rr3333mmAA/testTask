@@ -5,7 +5,7 @@ from aiogram.enums import ParseMode
 from django.shortcuts import render
 from django.conf import settings
 from django.http import JsonResponse
-from .models import User
+from .models import Users, Catalog, Category, Cart
 
 
 async def send_message_to_users(selected_users, message):
@@ -28,5 +28,8 @@ def send_message(request):
 
 
 def user_list(request):
-    users = User.objects.all()
-    return render(request, 'index.html', {'users': users})
+    users = Users.objects.all()
+    catalog = Catalog.objects.all()
+    categories = Category.objects.all()
+    cart = Cart.objects.all()
+    return render(request, 'index.html', {'users': users, 'catalog': catalog, 'categories': categories, 'cart': cart})

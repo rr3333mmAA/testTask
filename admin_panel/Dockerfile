@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+CMD python manage.py makemigrations users_table && python manage.py migrate users_table && python manage.py runserver 0.0.0.0:8000

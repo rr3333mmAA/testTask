@@ -18,9 +18,8 @@ async def main() -> None:
     # Initialize Bot instance
     bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
-    # Initialize database and create tables
-    init_db("testtask")
-    Database.create_tables()
+    # Initialize database and load starter catalog
+    Database("testtask")
     Database.load_starter_catalog()  # Load starter catalog from starter_catalog.json
 
     # Run events dispatching

@@ -3,6 +3,7 @@ from os import getenv
 import psycopg2
 import json
 
+from time import sleep
 from dotenv import load_dotenv
 
 
@@ -25,72 +26,6 @@ class Database:
             print(f"Database error: {e}")
 
     @classmethod
-    def create_tables(cls):
-        """
-        This method creates category and catalog tables in the database
-        """
-        try:
-            # Check if the tables exists in the current database
-            exists = []
-            for table in ["category", "catalog", "users", "cart"]:
-                cls.cur.execute(f"""
-                    SELECT EXISTS (
-                        SELECT 1
-                        FROM information_schema.tables 
-                        WHERE table_name = '{table}'
-                    );
-                """)
-                exists.append(cls.cur.fetchone()[0])
-
-            if not any(exists):
-                # Create category table
-                cls.cur.execute("""
-                    CREATE TABLE category (
-                        subcategory varchar PRIMARY KEY,
-                        category varchar
-                    );
-                """)
-
-                # Create catalog table
-                cls.cur.execute("""
-                    CREATE TABLE catalog (
-                        id serial PRIMARY KEY,
-                        product varchar,
-                        quantity integer,
-                        description varchar,
-                        img_path varchar,
-                        subcategory varchar,
-                        price integer,
-                        FOREIGN KEY (subcategory) REFERENCES category (subcategory)
-                    );
-                """)
-
-                # Create users table
-                cls.cur.execute("""
-                    CREATE TABLE users (
-                        id serial PRIMARY KEY,
-                        user_tgid integer,
-                        address varchar
-                    );
-                """)
-
-                # Create cart table
-                cls.cur.execute("""
-                    CREATE TABLE cart (
-                        id serial PRIMARY KEY,
-                        user_tgid integer,
-                        product varchar,
-                        quantity integer,
-                        amount integer
-                    );
-                """)
-
-                # Print success message
-                print("Tables created successfully")
-        except psycopg2.OperationalError as e:
-            print(f"Database error: {e}")
-
-    @classmethod
     def close(cls):
         """
         This method closes cursor and connection
@@ -106,6 +41,7 @@ class Database:
         """
         This method loads starter catalog data into the database
         """
+        sleep(5)
         try:
             json_catalog = json.load(open("starter_catalog.json"))
             if not json_catalog["init"]:

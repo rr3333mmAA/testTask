@@ -61,6 +61,80 @@
     </div>
 </form>
 
+
+<h2>Catalog</h2>
+
+<table>
+    <thead>
+        <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Description</th>
+        <th>Image path</th>
+        <th>Subcategory</th>
+        <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in catalog %}
+        <tr>
+        <td>{{ product.id }}</td>
+        <td>{{ product.product }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.img_path }}</td>
+        <td>{{ product.subcategory }}</td>
+        <td>{{ product.price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h2>Cart</h2>
+
+<table>
+    <thead>
+        <tr>
+        <th>Telegram ID</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart %}
+        <tr>
+        <td>{{ item.user_tgid }}</td>
+        <td>{{ item.product }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.amount }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h2>Category</h2>
+
+<table>
+    <thead>
+        <tr>
+        <th>Subcategory Name</th>
+        <th>Category Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+        <tr>
+        <td>{{ category.subcategory }}</td>
+        <td>{{ category.category }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <script>
     document.getElementById('messageForm').addEventListener('submit', function(event) {
         event.preventDefault();
